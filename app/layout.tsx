@@ -1,34 +1,24 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
-import "./globals.css";
+import type React from "react"
+import type { Metadata } from "next"
+import { Poppins } from "next/font/google"
+import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-display" })
 
 export const metadata: Metadata = {
-  title: "Falar em inglês",
-  description: "Pratique falar em inglês com conversas interativas alimentadas por IA.",
-};
+  title: "EnglishTalkAI - Practice English with AI",
+  description:
+    "Practice your English conversation skills with an interactive AI tutor. Get real-time feedback on pronunciation and grammar.",
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en">
+      <body className={`$ ${poppins.variable} font-sans antialiased `}>{children}</body>
     </html>
-  );
+  )
 }

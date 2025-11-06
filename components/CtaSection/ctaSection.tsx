@@ -1,5 +1,5 @@
-import Link from "next/link"
 import { Button } from "../ui/button"
+import { DecisionButton } from "../DecisionButton/decisionButton"
 
 export const CtaSection = () => {
   return(
@@ -9,12 +9,12 @@ export const CtaSection = () => {
         <p className="text-lg text-muted-foreground mb-8">
           Comece com uma sessão de prática gratuita e experimente o poder da aprendizagem guiada por IA.
         </p>
-        <Link href="/practice">
+        <DecisionButton>
           <Button size="lg" className="bg-primary hover:bg-primary/90">
             Comece Agora
             <span className="ml-2">→</span>
           </Button>
-        </Link>
+        </DecisionButton>
       </div>
     </section>
   )

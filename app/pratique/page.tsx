@@ -1,36 +1,21 @@
-'use client';
+'use client'; 
 
-import { MainCard } from "@/components/MainCard/mainCard";
-import { PracticeHeader } from "@/components/PracticeHeader/practiceHeader";
-import { ProgressBar } from "@/components/ProgressBar/progressBar";
-import { useState, useEffect } from 'react';
-import { auth } from "@/shared/firebase";
-import { useRouter } from 'next/router';
+import { redirect } from "next/navigation";
+import { useUserContext } from "@/shared/contexts/userContext";
+import { PracticeContent } from "@/components/PracticeContent/practiceContent";
 
 export default function PratiquePage() {
-  
-  const [sessionProgress, setSessionProgress] = useState(1);
-  const router = useRouter();
-  
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push('/login');
-      }
-    });
+  const { isAuthenticated, loading } = useUserContext();
 
-    return () => unsubscribe();
-  }, [router]);
+  if(loading) {
+    return <div>Loading...</div>;
+  }
 
-  
+  if (!isAuthenticated) {
+    redirect("/login");
+  }
+
   return (
-    <main
-    className="min-h-screen bg-background py-8 px-6">
-      <div className="max-w-2xl mx-auto">
-        <PracticeHeader />
-        <ProgressBar sessionProgress={sessionProgress} />
-        <MainCard />
-      </div>
-    </main>
+    <PracticeContent />
   );
 }

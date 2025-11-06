@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
+import { UserContextProvider } from "@/shared/contexts/userContext"
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-display" })
 
@@ -18,7 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`$ ${poppins.variable} font-sans antialiased `}>{children}</body>
+      <body className={`$ ${poppins.variable} font-sans antialiased `}>
+        <UserContextProvider>
+          {children}
+        </UserContextProvider>
+      </body>
     </html>
   )
 }

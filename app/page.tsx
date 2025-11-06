@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
 import { Header } from '../components/Header/header';
 import { Sparkles } from 'lucide-react';
 import { KnowledgeBites } from '@/components/KnowledgeBites/knowledgeBites';
 import { Features } from '@/components/Skills/features';
 import { CtaSection } from '@/components/CtaSection/ctaSection';
 import { Footer } from '@/components/Footer/footer';
+import { MoreDetails } from '@/components/MoreDetails/moreDetails';
 
 export default function Home() {
   return (
@@ -34,22 +34,7 @@ export default function Home() {
           className="text-lg md:text-xl text-muted-foreground text-center">
             Pratique conversação em inglês com um inteligente assistente virtual. Receba feedback instantâneo e melhore sua fluência.
           </p>
-          <div
-          className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-            className='bg-primary/80 flex gap-2 hover:bg-primary/70 font-bold cursor-pointer'
-            variant="default"
-            size="lg">
-              <span className="mr-2">🎤</span>
-              Comece a praticar
-            </Button>
-            <Button
-            className='bg-primary-foreground/90 border border-primary hover:bg-accent hover:border-accent hover:text-primary-foreground text-foreground text-center font-normal cursor-pointer w-full'
-            variant="default"
-            size="lg">
-              Saiba Mais
-            </Button>
-          </div>
+          <MoreDetails />
         </div>
       </section>
       <KnowledgeBites />

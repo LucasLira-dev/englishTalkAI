@@ -1,6 +1,6 @@
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { DecisionButton } from '../DecisionButton/decisionButton';
 
 export const Header = () => {
   return(
@@ -13,12 +13,12 @@ export const Header = () => {
             </div>
             <h1 className="font-display font-bold text-xl text-foreground">EnglishTalkAI</h1>
           </div>
-          <Link href="/login">
+          <DecisionButton>
             <Button variant="default" className="bg-primary hover:bg-primary/80 cursor-pointer font-bold">
               Comece
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-          </Link>
+          </DecisionButton>
         </div>
       </nav>
     </header>

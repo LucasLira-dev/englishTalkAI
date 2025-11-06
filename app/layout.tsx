@@ -6,9 +6,9 @@ import "./globals.css"
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-display" })
 
 export const metadata: Metadata = {
-  title: "EnglishTalkAI - Practice English with AI",
+  title: "EnglishTalkAI - Pratique sua conversação em inglês",
   description:
-    "Practice your English conversation skills with an interactive AI tutor. Get real-time feedback on pronunciation and grammar.",
+    "Pratique suas habilidades de conversação em inglês com um tutor de IA interativo. Obtenha feedback em tempo real sobre a pronúncia",
 }
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={`$ ${poppins.variable} font-sans antialiased `}>{children}</body>
     </html>
   )

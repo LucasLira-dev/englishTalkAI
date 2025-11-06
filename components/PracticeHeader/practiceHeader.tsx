@@ -1,4 +1,5 @@
 import { Button } from "../ui/button"
+import { LogOut } from 'lucide-react'
 
 export const PracticeHeader = () => {
   return (
@@ -7,12 +8,12 @@ export const PracticeHeader = () => {
         <Button 
         variant="outline" 
         size="sm"
-        className="hover:text-primary-foreground cursor-pointer">
-          Sair
+        className="hover:text-primary-foreground cursor-pointer flex items-center">
+          <LogOut className="w-4 h-4" />
         </Button>
-        <div className="text-center">
-          <h1 className="font-bold text-2xl"> Sessão de Prática</h1>
-          <p className="text-sm text-muted-foreground">Fase 1 de 6</p>
+        <div className="flex flex-col items-center">
+          <h1 className="font-bold text-2xl text-center"> Sessão de Prática</h1>
+          <p className="text-sm text-muted-foreground text-center">Fase 1 de 6</p>
         </div>
         <div className="w-16" />
       </div>

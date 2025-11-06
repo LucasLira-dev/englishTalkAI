@@ -3,11 +3,25 @@
 import { MainCard } from "@/components/MainCard/mainCard";
 import { PracticeHeader } from "@/components/PracticeHeader/practiceHeader";
 import { ProgressBar } from "@/components/ProgressBar/progressBar";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { auth } from "@/shared/firebase";
+import { useRouter } from 'next/router';
 
 export default function PratiquePage() {
   
   const [sessionProgress, setSessionProgress] = useState(1);
+  const router = useRouter();
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        router.push('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
   
   return (
     <main

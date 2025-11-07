@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 //
 const firebaseConfig = {
@@ -25,3 +25,24 @@ export const loginWithGoogle = () => {
 
   return signInWithPopup(auth, provider);
 };
+
+export async function getUnCompletedSession(userId: string) {
+  const sessionRef = collection(firestore, "practiceSessions");
+
+  const q = query(
+    sessionRef,
+    where("userId", "==", userId),
+    where("completed", "==", false),
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    // Retorna a primeira sessão encontrada (pode haver mais de uma, mas normalmente deve ter só uma)
+    const sessionDoc = querySnapshot.docs[0];
+    return { id: sessionDoc.id, ...sessionDoc.data() };
+  } else {
+    // Nenhuma sessão incompleta encontrada
+    return null;
+  }
+}

@@ -10,7 +10,7 @@ export const ButtonLogin = () => {
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(() => {
-        router.push("/practice");
+        router.push("/pratique");
       })
       .catch((error) => {
         console.error("Erro no login:", error);

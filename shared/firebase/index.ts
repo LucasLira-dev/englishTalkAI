@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 //
 const firebaseConfig = {
@@ -45,4 +51,8 @@ export async function getUnCompletedSession(userId: string) {
     // Nenhuma sessão incompleta encontrada
     return null;
   }
+}
+
+export async function logout() {
+  await auth.signOut();
 }

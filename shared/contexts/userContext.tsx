@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { createContext, useEffect, useState, useContext } from "react";
 import { auth } from "../firebase";
@@ -22,21 +22,35 @@ export const UserContextProvider = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log("🔥 UserContext: Initializing auth state listener");
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("🔥 UserContext: Auth state changed", {
+        hasUser: !!user,
+        uid: user?.uid,
+        email: user?.email,
+      });
+
       if (user) {
         setIsAuthenticated(true);
         setUser(user);
-        console.log(user)
+        console.log("✅ UserContext: User logged in", user);
       } else {
         setIsAuthenticated(false);
-        console.log(user)
         setUser(null);
+        console.log("❌ UserContext: User logged out", user);
       }
       setLoading(false);
+      console.log("🔥 UserContext: State updated", {
+        isAuthenticated: !!user,
+        loading: false,
+      });
     });
 
     // Cleanup subscription on unmount
-    return () => unsubscribe();
+    return () => {
+      console.log("🔥 UserContext: Cleaning up auth listener");
+      unsubscribe();
+    };
   }, []);
 
   const contextValue: UserContextProps = {

@@ -1,21 +1,33 @@
-'use client'; 
+"use client";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useUserContext } from "@/shared/contexts/userContext";
+import { PracticeProvider } from "@/shared/contexts/practiceContext";
 import { PracticeContent } from "@/components/PracticeContent/practiceContent";
+import { Loading } from "@/components/Loading/loading";
+import { useEffect } from "react";
 
 export default function PratiquePage() {
   const { isAuthenticated, loading } = useUserContext();
+  const router = useRouter();
 
-  if(loading) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return <Loading />;
   }
 
   if (!isAuthenticated) {
-    redirect("/login");
+    return <Loading />;
   }
 
   return (
-    <PracticeContent />
+    <PracticeProvider>
+      <PracticeContent />
+    </PracticeProvider>
   );
 }

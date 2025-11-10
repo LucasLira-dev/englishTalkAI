@@ -1,24 +1,23 @@
-'use client';
+"use client";
 
-import { loginWithGoogle } from '@/shared/firebase';
-import { useRouter } from 'next/navigation';
+import { loginWithGoogle } from "@/shared/firebase";
+import { useRouter } from "next/navigation";
 
 export const ButtonLogin = () => {
-  
   const router = useRouter();
-  
+
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(() => {
-        router.push("/pratique");
+        // Login page useEffect will handle redirect to /pratique
       })
       .catch((error) => {
         console.error("Erro no login:", error);
         alert(`Erro no login: ${error.message}`);
       });
   };
-  
-  return(
+
+  return (
     <button
       onClick={handleGoogleLogin}
       className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors cursor-pointer"
@@ -31,5 +30,5 @@ export const ButtonLogin = () => {
       </svg>
       <span>Continue com o Google</span>
     </button>
-  )
-}
+  );
+};

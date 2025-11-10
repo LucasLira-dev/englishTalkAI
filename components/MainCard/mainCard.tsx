@@ -136,62 +136,6 @@ export const MainCard = () => {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <div className="bg-primary-foreground flex flex-col gap-6 items-center justify-center p-6 border shadow-lg rounded-md min-w-full">
-  //       <div className="text-center">
-  //         <p className="text-2xl mb-2">⚠️</p>
-  //         <p className="text-sm text-red-500">{error}</p>
-  //         <Button onClick={handleNewSession} className="mt-4">
-  //           Tentar Novamente
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (isSessionComplete()) {
-  //   const correctAnswers =
-  //     currentSession?.userAnswers?.filter((answer) => answer.isCorrect)
-  //       .length || 0;
-  //   const totalAnswers = currentSession?.sentences.length || 6;
-  //   const percentage = Math.round((correctAnswers / totalAnswers) * 100);
-
-  //   return (
-  //     <div className="bg-primary-foreground flex flex-col gap-6 items-center justify-center p-6 border shadow-lg rounded-md min-w-full">
-  //       <div className="text-center">
-  //         <p className="text-4xl mb-4">🎉</p>
-  //         <h2 className="text-2xl font-bold mb-2">Sessão Completa!</h2>
-  //         <p className="text-lg mb-4">
-  //           Você acertou {correctAnswers} de {totalAnswers} frases ({percentage}
-  //           %)
-  //         </p>
-
-  //         <div className="space-y-2 mb-6">
-  //           {currentSession?.userAnswers?.map((answer, index) => (
-  //             <div
-  //               key={index}
-  //               className="text-sm text-left p-2 bg-muted rounded"
-  //             >
-  //               <p className="font-medium">{answer.sentence}</p>
-  //               <p
-  //                 className={`text-xs ${answer.isCorrect ? "text-green-600" : "text-red-600"}`}
-  //               >
-  //                 {answer.isCorrect ? "✅ Correto" : "❌ Incorreto"}: &quot;
-  //                 {answer.userAnswer}&quot;
-  //               </p>
-  //             </div>
-  //           ))}
-  //         </div>
-
-  //         <Button onClick={handleNewSession} className="w-full">
-  //           Começar Nova Sessão
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="bg-primary-foreground flex flex-col gap-6 items-center justify-center p-6 border shadow-lg rounded-md min-w-full">
       <div className="text-center w-full">
@@ -260,7 +204,7 @@ export const MainCard = () => {
             className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
             size="lg"
           >
-            Próxima Frase
+            Continuar
           </Button>
         ) : !isListening && !isAnalyzing ? (
           <Button

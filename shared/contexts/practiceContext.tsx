@@ -29,32 +29,51 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
   // 🔹 Busca ou cria sessão quando o usuário loga
   useEffect(() => {
     if (!user) {
+      // Reset all states when user logs out
+      setSession(null);
+      setCurrentSentence(null);
+      setProgress(0);
       setLoading(false);
       return;
     }
-    loadSession();
+
+    // Only load session if we don't have one yet or if user changed
+    if (!session || session.userId !== user.uid) {
+      loadSession();
+    } else {
+      setLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function loadSession() {
     console.log("Loading session...");
-    if (!auth.currentUser) return;
+    if (!auth.currentUser || !user) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await fetch("/api/practice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.uid }),
+        body: JSON.stringify({ userId: user.uid }),
       });
 
       const data = await res.json();
-      setSession(data.session);
-      console.log(data.session);
-      setCurrentSentence(data.session.sentences[data.session.currentIndex]);
-      setProgress(data.session.currentIndex + 1);
+      if (data.session) {
+        setSession(data.session);
+        console.log(data.session);
+        setCurrentSentence(data.session.sentences[data.session.currentIndex]);
+        setProgress(data.session.currentIndex + 1);
+      }
     } catch (error) {
       console.error("Error loading session:", error);
+      // Reset states on error
+      setSession(null);
+      setCurrentSentence(null);
+      setProgress(0);
     } finally {
       setLoading(false);
     }

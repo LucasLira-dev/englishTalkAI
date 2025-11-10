@@ -1,19 +1,27 @@
-'use client'; 
+"use client";
 
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useUserContext } from "@/shared/contexts/userContext";
 import { ButtonLogin } from "@/components/ButtonLogin/buttonLogin";
+import { Loading } from "@/components/Loading/loading";
+import { useEffect } from "react";
 
 export default function LoginPage() {
-  
   const { isAuthenticated, loading } = useUserContext();
-  
-  if (loading) return <div>Loading...</div>;
-  
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push("/pratique");
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) return <Loading />;
+
   if (isAuthenticated) {
-    redirect('/')
+    return <Loading />;
   }
 
   return (

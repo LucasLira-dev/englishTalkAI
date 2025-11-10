@@ -12,9 +12,17 @@ export const DecisionButton = ({ children }: DecisionButtonProps) => {
   const { isAuthenticated } = useUserContext();
   
     return (
-        <Link
-          href={isAuthenticated ? '/pratique' : '/login'}>
-          {children}
-        </Link>
+      <>
+        {isAuthenticated ? (
+          <Link href="/pratique">
+            {children}
+          </Link>
+        ) : (
+          <Link href="/login">
+            {children}
+          </Link>
+        )
+        }
+      </>
     );
 };

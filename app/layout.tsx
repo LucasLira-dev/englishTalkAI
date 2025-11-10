@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { UserContextProvider } from "@/shared/contexts/userContext";
-import { PracticeProvider} from "@/shared/contexts/practiceContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -25,9 +24,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`$ ${poppins.variable} font-sans antialiased `}>
-        <UserContextProvider>
-          <PracticeProvider>{children}</PracticeProvider>
-        </UserContextProvider>
+        <UserContextProvider>{children}</UserContextProvider>
       </body>
     </html>
   );

@@ -95,6 +95,7 @@ export async function generateResult(
     - Be encouraging but honest
     - If words are very similar or just small grammatical differences, consider it correct
     - If the meaning is completely different or most words are wrong, mark as incorrect
+    - Reply in Portugues
 
     Examples of acceptable variations:
     - "Hello how are you" vs "Hello, how are you today?" → CORRECT

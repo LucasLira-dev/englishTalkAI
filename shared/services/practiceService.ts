@@ -1,4 +1,13 @@
-import { addDoc, collection, doc, serverTimestamp, Timestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+  getDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import { firestore } from "../firebase";
 
 export interface PracticeSession {
@@ -21,12 +30,40 @@ export async function savePracticeSession(userId: string, sentences: string[]) {
     createdAt: serverTimestamp(),
   };
 
-  const docRef = await addDoc(collection(firestore, "practiceSessions"), sessionData);
+  const docRef = await addDoc(
+    collection(firestore, "practiceSessions"),
+    sessionData,
+  );
   return { id: docRef.id, ...sessionData };
 }
-
 
 export async function markSessionAsCompleted(sessionId: string) {
   const sessionDoc = doc(firestore, "practiceSessions", sessionId);
   await updateDoc(sessionDoc, { completed: true });
+}
+
+export async function markAnswerAsCorrect(sessionId: string, answer: string) {
+  const sessionDoc = doc(firestore, "practiceSessions", sessionId);
+
+  await updateDoc(sessionDoc, {
+    userAnswers: arrayUnion(answer),
+  });
+}
+
+export async function incrementCurrentIndex(sessionId: string) {
+  const sessionDoc = doc(firestore, "practiceSessions", sessionId);
+
+  // Get current session data
+  const sessionSnap = await getDoc(sessionDoc);
+  if (!sessionSnap.exists()) {
+    throw new Error("Session not found");
+  }
+
+  const sessionData = sessionSnap.data() as PracticeSession;
+  const newCurrentIndex = sessionData.currentIndex + 1;
+
+  // Update current index
+  await updateDoc(sessionDoc, {
+    currentIndex: newCurrentIndex,
+  });
 }

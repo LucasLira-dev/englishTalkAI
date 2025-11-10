@@ -4,6 +4,7 @@ import { auth } from "@/shared/firebase";
 import { markSessionAsCompleted } from "../services/practiceService";
 import { PracticeSession } from "../services/practiceService";
 import { useUserContext } from "@/shared/contexts/userContext";
+import { updateSessionProgress } from "@/lib/utils";
 
 interface PracticeContextType {
   session: PracticeSession | null;
@@ -12,6 +13,7 @@ interface PracticeContextType {
   refreshSession: () => Promise<void>;
   currentSentence: string | null;
   progress: number;
+  checkAnswer: (answer: string) => Promise<void>;
 }
 
 const PracticeContext = createContext<PracticeContextType>(null!);
@@ -21,7 +23,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [currentSentence, setCurrentSentence] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  
+
   const { user } = useUserContext();
 
   // 🔹 Busca ou cria sessão quando o usuário loga
@@ -31,7 +33,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     loadSession();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function loadSession() {
@@ -73,6 +75,25 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // checar se usuario acertou
+  async function checkAnswer(answer: string) {
+    if (!session) return;
+
+    try {
+      await updateSessionProgress(
+        session.id,
+        answer,
+        setProgress,
+        setCurrentSentence,
+        session.sentences,
+        progress,
+        completeSession,
+      );
+    } catch (error) {
+      console.error("Error checking answer:", error);
+    }
+  }
+
   return (
     <PracticeContext.Provider
       value={{
@@ -82,6 +103,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
         refreshSession: loadSession,
         currentSentence,
         progress,
+        checkAnswer,
       }}
     >
       {children}

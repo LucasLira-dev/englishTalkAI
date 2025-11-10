@@ -13,7 +13,6 @@ export const PracticeHeader = () => {
         </Button>
         <div className="flex flex-col items-center">
           <h1 className="font-bold text-2xl text-center"> Sessão de Prática</h1>
-          <p className="text-sm text-muted-foreground text-center">Fase 1 de 6</p>
         </div>
         <div className="w-16" />
       </div>

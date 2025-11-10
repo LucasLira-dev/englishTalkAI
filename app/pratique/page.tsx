@@ -17,6 +17,17 @@ export default function PratiquePage() {
     }
   }, [isAuthenticated, loading, router]);
 
+  useEffect(() => {
+    const onPop = () => {
+      if (window.location.pathname !== "/") {
+        router.replace("/");
+      }
+    };
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [router]);
+
   if (loading) {
     return <Loading />;
   }

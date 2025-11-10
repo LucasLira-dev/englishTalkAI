@@ -18,8 +18,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_APP_ID,
 };
 
-console.log(firebaseConfig);
-
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 

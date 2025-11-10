@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateResult } from "../route";
+import { generateResult } from "../../../lib/genai";
 import { markAnswerAsCorrect } from "@/shared/services/practiceService";
 
 export async function POST(request: NextRequest) {
   try {
-    // Log request start
-    console.log("Evaluating pronunciation attempt...");
 
     let body;
     try {
@@ -53,7 +51,6 @@ export async function POST(request: NextRequest) {
     if (evaluation.isCorrect && sessionId) {
       try {
         await markAnswerAsCorrect(sessionId, userAnswer);
-        console.log(`Answer marked as correct for session ${sessionId}`);
       } catch (persistError) {
         console.error("Error persisting correct answer:", persistError);
         // Don't fail the request if persistence fails, just log it

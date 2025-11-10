@@ -37,7 +37,6 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Only load session if we don't have one yet or if user changed
     if (!session || session.userId !== user.uid) {
       loadSession();
     } else {
@@ -47,7 +46,6 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   async function loadSession() {
-    console.log("Loading session...");
     if (!auth.currentUser || !user) {
       setLoading(false);
       return;
@@ -64,7 +62,6 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.session) {
         setSession(data.session);
-        console.log(data.session);
         setCurrentSentence(data.session.sentences[data.session.currentIndex]);
         setProgress(data.session.currentIndex + 1);
       }

@@ -1,10 +1,8 @@
 "use client";
 
 import { loginWithGoogle } from "@/shared/firebase";
-import { useRouter } from "next/navigation";
 
 export const ButtonLogin = () => {
-  const router = useRouter();
 
   const handleGoogleLogin = () => {
     loginWithGoogle()

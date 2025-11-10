@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateSession } from "../route";
+import { generateSession } from "../../../lib/genai";
 import { savePracticeSession } from "@/shared/services/practiceService";
 import { getUnCompletedSession } from "@/shared/firebase";
 
@@ -9,14 +9,12 @@ export async function POST(request: Request) {
     
     const existingSession = await getUnCompletedSession(userId);
     if (existingSession) {
-      console.log("Returning existing session for user:", userId);
       return NextResponse.json({
         success: true,
         session: existingSession,
       });
     }
     
-    console.log("Generating new practice session...");
 
     // Generate 6 sentences for the session
     const sentences = await generateSession();

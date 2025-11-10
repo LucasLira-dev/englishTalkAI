@@ -6,28 +6,16 @@ import { usePractice } from "@/shared/contexts/practiceContext";
 import { processSpeechResult } from "@/lib/utils";
 
 export const MainCard = () => {
-  const {
-    currentSentence,
-    progress,
-    loading,
-    session,
-    checkAnswer,
-  } = usePractice();
+  const { currentSentence, progress, loading, session, checkAnswer } = usePractice();
 
   const [isListening, setIsListening] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
-  const [lastResult, setLastResult] = useState<{
-    isCorrect: boolean;
-    feedback: string;
-  } | null>(null);
+  const [lastResult, setLastResult] = useState<{ isCorrect: boolean; feedback: string } | null>(null);
 
-  // Speech recognition refs
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  // const isRecognitionSupported = useRef(false);
 
-  // Reset states when a new session is loaded
   useEffect(() => {
     if (session) {
       setShowResult(false);
@@ -36,7 +24,7 @@ export const MainCard = () => {
       setIsListening(false);
       setIsAnalyzing(false);
     }
-  }, [session]); // Reset when session changes
+  }, [session]);
 
   const handleNext = () => {
     setShowResult(false);
@@ -44,7 +32,26 @@ export const MainCard = () => {
     setUserAnswer("");
   };
 
-  // Função para processar a resposta do usuário
+  // 🔊 PLAY AUDIO — ajustado para funcionar no celular
+  const playAudio = () => {
+    if (!currentSentence) return;
+
+    // sempre cancela o que estiver tocando
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(currentSentence);
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
+
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error("Erro ao reproduzir áudio:", err);
+      alert("O áudio não pôde ser reproduzido. Tente novamente.");
+    }
+  };
+
+  // 🎤 PROCESSA RESULTADO
   const handleSpeechResult = async (transcript: string) => {
     setUserAnswer(transcript);
     setIsAnalyzing(true);
@@ -58,7 +65,7 @@ export const MainCard = () => {
           sessionId: session?.id,
           progress,
         },
-        checkAnswer,
+        checkAnswer
       );
 
       setLastResult(result.result);
@@ -75,22 +82,29 @@ export const MainCard = () => {
     }
   };
 
-  const handleListen = () => {
-    const speechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!speechRecognition) {
-      console.error("Speech recognition not supported");
+  // 🎤 ESCUTAR FALA — ajustado para Android/iOS
+  const handleListen = async () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Reconhecimento de voz não é suportado neste dispositivo. Tente usar o Chrome no Android ou no computador.");
       return;
     }
-    const recognition = new speechRecognition();
+
+    // no Android, precisa garantir permissão de microfone
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      alert("Permissão para usar o microfone é necessária.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
     recognitionRef.current = recognition;
-
-    recognition.start();
-    setIsListening(true);
 
     recognition.onresult = (event) => {
       const result = event.results[event.results.length - 1][0].transcript;
@@ -100,37 +114,31 @@ export const MainCard = () => {
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
       setIsListening(false);
+      if (event.error === "network") {
+        alert("Erro de rede no reconhecimento de voz. Tente novamente.");
+      }
     };
 
     recognition.onend = () => {
       setIsListening(false);
     };
+
+    recognition.start();
+    setIsListening(true);
   };
 
   const handleStopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
+    recognitionRef.current?.stop();
     setIsListening(false);
   };
 
-  const playAudio = () => {
-    if (currentSentence) {
-      const utterance = new SpeechSynthesisUtterance(currentSentence);
-      utterance.lang = "en-US";
-      utterance.rate = 0.8;
-      speechSynthesis.speak(utterance);
-    }
-  };
-
+  // 🎨 JSX
   if (loading) {
     return (
       <div className="bg-primary-foreground flex flex-col gap-6 items-center justify-center p-6 border shadow-lg rounded-md min-w-full">
         <div className="text-center">
           <p className="text-2xl mb-2">⏳</p>
-          <p className="text-sm text-muted-foreground">
-            Gerando nova sessão...
-          </p>
+          <p className="text-sm text-muted-foreground">Gerando nova sessão...</p>
         </div>
       </div>
     );
@@ -144,9 +152,7 @@ export const MainCard = () => {
       </div>
 
       <div className="p-4 bg-chart-2/95 rounded-md text-primary-foreground w-full text-center">
-        <p className="text-md font-bold">
-          &quot; {currentSentence || "Carregando..."} &quot;
-        </p>
+        <p className="text-md font-bold">{currentSentence || "Carregando..."}</p>
       </div>
 
       <Button
@@ -170,28 +176,18 @@ export const MainCard = () => {
           ) : isAnalyzing ? (
             <>
               <p className="text-2xl mb-2">⏳</p>
-              <p className="text-sm text-muted-foreground">
-                Analisando sua pronúncia...
-              </p>
+              <p className="text-sm text-muted-foreground">Analisando sua pronúncia...</p>
             </>
           ) : showResult && lastResult ? (
             <>
-              <p className="text-2xl mb-2">
-                {lastResult.isCorrect ? "✅" : "❌"}
-              </p>
-              <p className="text-sm text-muted-foreground mb-2">
-                {lastResult.feedback}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Você disse: &quot;{userAnswer}&quot;
-              </p>
+              <p className="text-2xl mb-2">{lastResult.isCorrect ? "✅" : "❌"}</p>
+              <p className="text-sm text-muted-foreground mb-2">{lastResult.feedback}</p>
+              <p className="text-xs text-muted-foreground">Você disse: &quot;{userAnswer}&quot;</p>
             </>
           ) : (
             <>
               <p className="text-2xl mb-2">🎤</p>
-              <p className="text-sm text-muted-foreground">
-                Clique para começar a falar
-              </p>
+              <p className="text-sm text-muted-foreground">Clique para começar a falar</p>
             </>
           )}
         </div>

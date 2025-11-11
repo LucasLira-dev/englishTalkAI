@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import { usePractice } from "@/shared/contexts/practiceContext";
 import { processSpeechResult } from "@/lib/utils";
+import { textToSpeech } from "@/shared/services/elevenLabsService";
 
 export const MainCard = () => {
   const { currentSentence, progress, loading, session, checkAnswer } =
@@ -38,35 +39,16 @@ export const MainCard = () => {
   };
 
   // 🔊 PLAY AUDIO — ajustado para funcionar no celular
-  const playAudio = () => {
+  const playAudio = async () => {
     if (!currentSentence) return;
-
-    // sempre cancela o que estiver tocando
-    window.speechSynthesis.cancel();
 
     setIsProcessing(true);
 
-    const utterance = new SpeechSynthesisUtterance(currentSentence);
-    utterance.lang = "en-US";
-    utterance.rate = 0.9;
-
-    // Callback para quando o áudio terminar
-    utterance.onend = () => {
-      setIsProcessing(false);
-    };
-
-    utterance.onerror = () => {
-      console.error("Erro ao reproduzir áudio");
-      setIsProcessing(false);
-      alert("O áudio não pôde ser reproduzido. Tente novamente.");
-    };
-
     try {
-      window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.error("Erro ao reproduzir áudio:", err);
-      alert("O áudio não pôde ser reproduzido. Tente novamente.");
+      await textToSpeech(currentSentence);
+    } catch (error) {
       setIsProcessing(false);
+      console.error("Erro ao reproduzir áudio:", error);
     }
   };
 

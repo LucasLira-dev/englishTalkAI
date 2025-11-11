@@ -90,15 +90,59 @@ export async function transcribeAudio(blob: Blob): Promise<string> {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Erro na API do ElevenLabs: ${response.status} ${response.statusText}`,
-      );
+      console.warn("ElevenLabs failed, trying Web Speech API fallback...");
+      return await transcribeWithWebSpeechAPI();
     }
 
     const data = await response.json();
     return data.text;
   } catch (error) {
     console.error("Erro no serviço ElevenLabs:", error);
-    throw error;
+    console.log("Fallback para Web Speech API...");
+    return await transcribeWithWebSpeechAPI();
   }
+}
+
+// Fallback function using Web Speech API
+async function transcribeWithWebSpeechAPI(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      reject(new Error("Neither ElevenLabs nor Web Speech API are available"));
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    let hasResult = false;
+
+    recognition.onresult = (event: any) => {
+      hasResult = true;
+      const transcript = event.results[0][0].transcript;
+      resolve(transcript.trim());
+    };
+
+    recognition.onerror = (event: any) => {
+      reject(new Error(`Web Speech API error: ${event.error}`));
+    };
+
+    recognition.onend = () => {
+      if (!hasResult) {
+        reject(new Error("No speech detected"));
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch (error) {
+      reject(new Error("Failed to start Web Speech API"));
+    }
+  });
 }

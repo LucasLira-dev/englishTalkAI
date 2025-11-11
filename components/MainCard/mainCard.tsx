@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { usePractice } from "@/shared/contexts/practiceContext";
 import { processSpeechResult } from "@/lib/utils";
 import { textToSpeech } from "@/shared/services/elevenLabsService";
+import { transcribeAudio } from "@/shared/services/elevenLabsService";
 
 export const MainCard = () => {
   const { currentSentence, progress, loading, session, checkAnswer } =
@@ -20,7 +21,8 @@ export const MainCard = () => {
     feedback: string;
   } | null>(null);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (session) {
@@ -50,6 +52,8 @@ export const MainCard = () => {
       setIsProcessing(false);
       console.error("Erro ao reproduzir áudio:", error);
     }
+
+    setIsProcessing(false);
   };
 
   // 🎤 PROCESSA RESULTADO
@@ -85,54 +89,48 @@ export const MainCard = () => {
 
   // 🎤 ESCUTAR FALA — ajustado para Android/iOS
   const handleListen = async () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert(
-        "Reconhecimento de voz não é suportado neste dispositivo. Tente usar o Chrome no Android ou no computador.",
-      );
-      return;
-    }
-
-    // no Android, precisa garantir permissão de microfone
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+
+      const mediaRecorder = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+
+        setIsListening(false);
+        setIsAnalyzing(true);
+
+        try {
+          const transcript = await transcribeAudio(audioBlob);
+          await handleSpeechResult(transcript);
+        } catch (error) {
+          console.error("Erro ao transcrever:", error);
+          alert("Erro ao processar áudio.");
+        } finally {
+          setIsAnalyzing(false);
+        }
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsListening(true);
+    } catch (err) {
+      console.error("Erro ao acessar microfone:", err);
       alert("Permissão para usar o microfone é necessária.");
-      return;
     }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognitionRef.current = recognition;
-
-    recognition.onresult = (event) => {
-      const result = event.results[event.results.length - 1][0].transcript;
-      handleSpeechResult(result);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      setIsListening(false);
-      if (event.error === "network") {
-        alert("Erro de rede no reconhecimento de voz. Tente novamente.");
-      }
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
-    setIsListening(true);
   };
 
   const handleStopListening = () => {
-    recognitionRef.current?.stop();
+    mediaRecorderRef.current?.stop();
     setIsListening(false);
   };
 

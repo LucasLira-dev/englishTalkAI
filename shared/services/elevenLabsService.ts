@@ -1,5 +1,3 @@
-
-
 export const textToSpeech = async (text: string): Promise<void> => {
   const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
   const API_KEY = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
@@ -80,3 +78,27 @@ export const textToSpeech = async (text: string): Promise<void> => {
     throw error;
   }
 };
+
+export async function transcribeAudio(blob: Blob): Promise<string> {
+  try {
+    const formData = new FormData();
+    formData.append("file", blob, "audio.webm");
+
+    const response = await fetch("/api/transcribe", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Erro na API do ElevenLabs: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error("Erro no serviço ElevenLabs:", error);
+    throw error;
+  }
+}

@@ -1,6 +1,6 @@
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { LogOut } from "lucide-react";
-import { logout } from "../../shared/firebase";
+import { logout } from "../../../shared/firebase";
 import { useRouter } from "next/navigation";
 
 export const PracticeHeader = () => {

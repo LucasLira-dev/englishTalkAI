@@ -14,6 +14,22 @@ export const metadata: Metadata = {
   title: "EnglishTalkAI - Pratique sua conversação em inglês",
   description:
     "Pratique suas habilidades de conversação em inglês com um tutor de IA interativo. Obtenha feedback em tempo real sobre a pronúncia",
+  openGraph: {
+      title: "EnglishTalkAI",
+      description: "Pratique suas habilidades de conversação em inglês com um tutor de IA interativo. Obtenha feedback em tempo real sobre a pronúncia",
+      url: "https://english-talk-ai.vercel.app/",
+      siteName: "EnglishTalkAI",
+      images: [
+        {
+          url: "siteImage.png",
+          width: 1200,
+          height: 630,
+          alt: "EnglishTalkAI",
+        },
+      ],
+      locale: "pt-BR",
+      type: "website",
+    },
 };
 
 export default function RootLayout({

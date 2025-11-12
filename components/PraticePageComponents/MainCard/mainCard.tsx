@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { usePractice } from "@/shared/contexts/practiceContext";
 import { textToSpeech } from "@/shared/services/elevenLabsService";
 import { useAudioRecording } from "@/shared/hooks/useAudioRecording";
+import { PlayAudioButton } from "../PlayAudioButton/playAudioButton";
+import { AudioFeedback } from "../AudioFeedback/audioFeedback";
 
 
 export const MainCard = () => {
@@ -14,7 +16,6 @@ export const MainCard = () => {
   const { handleListen, showResult, setShowResult, setLastResult, setUserAnswer, setIsListening, setIsAnalyzing, isListening, isAnalyzing, lastResult, userAnswer, handleStopListening } = useAudioRecording();
 
   const [isProcessing, setIsProcessing] = useState(false)
-
 
   useEffect(() => {
     if (session) {
@@ -31,8 +32,7 @@ export const MainCard = () => {
     setLastResult(null);
     setUserAnswer("");
   };
-
-  // 🔊 PLAY AUDIO — ajustado para funcionar no celular
+  
   const playAudio = async () => {
     if (!currentSentence) return;
 
@@ -46,7 +46,6 @@ export const MainCard = () => {
     }
     setIsProcessing(false);
   };
-  
 
   // 🎨 JSX
   if (loading) {
@@ -74,61 +73,21 @@ export const MainCard = () => {
           {currentSentence || "Carregando..."}
         </p>
       </div>
-
-      <Button
-        onClick={playAudio}
-        variant="outline"
-        className="w-full bg-transparent hover:bg-accent/80 hover:text-primary-foreground font-bold cursor-pointer"
-        disabled={!currentSentence || isProcessing}
-      >
-        {isProcessing ? (
-          <div className="flex items-center gap-2">
-            <span className="inline-block animate-sway">🔊</span>
-            <span>Carregando áudio...</span>
-          </div>
-        ) : (
-          "🔊 Ouvir"
-        )}
-      </Button>
-
+      
+      <PlayAudioButton 
+      currentSentence={currentSentence} 
+      isProcessing={isProcessing} 
+      playAudio={playAudio} />
+      
       <p className="text-sm mt-4">Agora repita a frase</p>
 
-      <div className="p-4 flex flex-col justify-center items-center shadow-md border border-gray-300 rounded-md w-full">
-        <div className="text-center">
-          {isListening ? (
-            <>
-              <p className="text-2xl mb-2 animate-pulse">🎤</p>
-              <p className="text-sm text-muted-foreground">Ouvindo...</p>
-            </>
-          ) : isAnalyzing ? (
-            <>
-              <p className="text-2xl mb-2">⏳</p>
-              <p className="text-sm text-muted-foreground">
-                Analisando sua pronúncia...
-              </p>
-            </>
-          ) : showResult && lastResult ? (
-            <>
-              <p className="text-2xl mb-2">
-                {lastResult.isCorrect ? "✅" : "❌"}
-              </p>
-              <p className="text-sm text-muted-foreground mb-2">
-                {lastResult.feedback}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Você disse: &quot;{userAnswer}&quot;
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-2xl mb-2">🎤</p>
-              <p className="text-sm text-muted-foreground">
-                Clique para começar a falar
-              </p>
-            </>
-          )}
-        </div>
-      </div>
+      .<AudioFeedback
+      isAnalyzing={isAnalyzing}
+      isListening={isListening}
+      lastResult={lastResult}
+      isCorrect={lastResult?.isCorrect}
+      
+      />
 
       <div className="flex gap-4 w-full">
         {showResult ? (

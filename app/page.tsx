@@ -1,10 +1,10 @@
-import { Header } from '../components/Header/header';
+import { Header } from '../components/HomeComponents/Header/header';
 import { Sparkles } from 'lucide-react';
-import { KnowledgeBites } from '@/components/KnowledgeBites/knowledgeBites';
-import { Features } from '@/components/Skills/features';
-import { CtaSection } from '@/components/CtaSection/ctaSection';
-import { Footer } from '@/components/Footer/footer';
-import { MoreDetails } from '@/components/MoreDetails/moreDetails';
+import { KnowledgeBites } from '@/components/HomeComponents/KnowledgeBites/knowledgeBites';
+import { Features } from '@/components/HomeComponents/Skills/features';
+import { CtaSection } from '@/components/HomeComponents/CtaSection/ctaSection';
+import { Footer } from '@/components/HomeComponents/Footer/footer';
+import { MoreDetails } from '@/components/HomeComponents/MoreDetails/moreDetails';
 
 export default function Home() {
   return (

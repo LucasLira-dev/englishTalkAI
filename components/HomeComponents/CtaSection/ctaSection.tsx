@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from "../ui/button"
-import { DecisionButton } from "../DecisionButton/decisionButton"
+import { Button } from "../../ui/button"
+import { DecisionButton } from "../../DecisionButton/decisionButton"
 import { useUserContext } from '@/shared/contexts/userContext';
 
 export const CtaSection = () => {

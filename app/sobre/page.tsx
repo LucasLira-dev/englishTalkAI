@@ -1,8 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Footer } from "@/components/Footer/footer"
-import { Header } from "@/components/Header/header"
+import { Footer } from "@/components/HomeComponents/Footer/footer"
+import { Header } from "@/components/HomeComponents/Header/header"
 import { DecisionButton } from "@/components/DecisionButton/decisionButton"
 
 export default function AboutPage() {

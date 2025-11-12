@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/shared/contexts/userContext";
 import { PracticeProvider } from "@/shared/contexts/practiceContext";
-import { PracticeContent } from "@/components/PracticeContent/practiceContent";
+import { PracticeContent } from "@/components/PraticePageComponents/PracticeContent/practiceContent";
 import { Loading } from "@/components/Loading/loading";
 import { useEffect } from "react";
 

@@ -2,7 +2,7 @@
 
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DecisionButton } from '../DecisionButton/decisionButton';
+import { DecisionButton } from '../../DecisionButton/decisionButton';
 import { useUserContext } from '@/shared/contexts/userContext';
 
 export const Header = () => {

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from "next/link";
-import { DecisionButton } from "../DecisionButton/decisionButton";
-import { Button } from "../ui/button";
+import { DecisionButton } from "../../DecisionButton/decisionButton";
+import { Button } from "../../ui/button";
 import { useUserContext } from "@/shared/contexts/userContext";
 
 export const MoreDetails = () => {

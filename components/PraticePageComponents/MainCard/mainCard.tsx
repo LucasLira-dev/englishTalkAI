@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "../../ui/button";
 import { usePractice } from "@/shared/contexts/practiceContext";
 import { textToSpeech } from "@/shared/services/elevenLabsService";
 import { useAudioRecording } from "@/shared/hooks/useAudioRecording";
 import { PlayAudioButton } from "../PlayAudioButton/playAudioButton";
+import { VoiceButton } from "../VoiceButton/voiceButton";
 import { AudioFeedback } from "../AudioFeedback/audioFeedback";
 
 
 export const MainCard = () => {
   const { currentSentence, progress, loading, session } =
     usePractice();
-  
-  const { handleListen, showResult, setShowResult, setLastResult, setUserAnswer, setIsListening, setIsAnalyzing, isListening, isAnalyzing, lastResult, userAnswer, handleStopListening } = useAudioRecording();
+
+  const { setShowResult, setLastResult, setUserAnswer, setIsListening, setIsAnalyzing, isAnalyzing, isListening, lastResult, showResult, userAnswer, handleListen, handleStopListening } = useAudioRecording();
 
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -81,43 +81,23 @@ export const MainCard = () => {
       
       <p className="text-sm mt-4">Agora repita a frase</p>
 
-      .<AudioFeedback
-      isAnalyzing={isAnalyzing}
-      isListening={isListening}
-      lastResult={lastResult}
-      isCorrect={lastResult?.isCorrect}
-      
+      <AudioFeedback
+        isListening={isListening}
+        isAnalyzing={isAnalyzing}
+        showResult={showResult}
+        lastResult={lastResult}
+        userAnswer={userAnswer}
       />
 
-      <div className="flex gap-4 w-full">
-        {showResult ? (
-          <Button
-            onClick={handleNext}
-            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
-            size="lg"
-          >
-            Continuar
-          </Button>
-        ) : !isListening && !isAnalyzing ? (
-          <Button
-            onClick={handleListen}
-            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
-            size="lg"
-            disabled={!currentSentence}
-          >
-            🎤 Comece a falar
-          </Button>
-        ) : (
-          <Button
-            onClick={handleStopListening}
-            disabled={isAnalyzing}
-            className="flex-1 bg-accent hover:bg-accent/90"
-            size="lg"
-          >
-            {isAnalyzing ? "⏳ Analisando..." : "⏹️ Parar"}
-          </Button>
-        )}
-      </div>
+      <VoiceButton
+        currentSentence={currentSentence}
+        handleNext={handleNext}
+        isListening={isListening}
+        isAnalyzing={isAnalyzing}
+        showResult={showResult}
+        handleListen={handleListen}
+        handleStopListening={handleStopListening}
+      />
     </div>
   );
 };

@@ -141,7 +141,7 @@ export const MainCard = () => {
         <div className="text-center">
           <p className="text-2xl mb-2">⏳</p>
           <p className="text-sm text-muted-foreground">
-            Gerando nova sessão...
+            Buscando sessão...
           </p>
         </div>
       </div>
@@ -167,7 +167,14 @@ export const MainCard = () => {
         className="w-full bg-transparent hover:bg-accent/80 hover:text-primary-foreground font-bold cursor-pointer"
         disabled={!currentSentence || isProcessing}
       >
-        {isProcessing ? "🔊 Tocando..." : "🔊 Ouvir"}
+        {isProcessing ? (
+          <div className="flex items-center gap-2">
+            <span className="inline-block animate-sway">🔊</span>
+            <span>Carregando áudio...</span>
+          </div>
+        ) : (
+          "🔊 Ouvir"
+        )}
       </Button>
 
       <p className="text-sm mt-4">Agora repita a frase</p>
@@ -241,3 +248,26 @@ export const MainCard = () => {
     </div>
   );
 };
+
+// CSS personalizado para animação de balanço
+const style = `
+  @keyframes sway {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  .animate-sway {
+    animation: sway 0.8s ease-in-out infinite;
+  }
+`;
+
+// Inject CSS
+if (
+  typeof document !== "undefined" &&
+  !document.getElementById("sway-animation")
+) {
+  const styleElement = document.createElement("style");
+  styleElement.id = "sway-animation";
+  styleElement.textContent = style;
+  document.head.appendChild(styleElement);
+}

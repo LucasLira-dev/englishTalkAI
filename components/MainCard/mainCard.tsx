@@ -1,28 +1,20 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { usePractice } from "@/shared/contexts/practiceContext";
-import { processSpeechResult } from "@/lib/utils";
 import { textToSpeech } from "@/shared/services/elevenLabsService";
-import { transcribeAudio } from "@/shared/services/elevenLabsService";
+import { useAudioRecording } from "@/shared/hooks/useAudioRecording";
+
 
 export const MainCard = () => {
-  const { currentSentence, progress, loading, session, checkAnswer } =
+  const { currentSentence, progress, loading, session } =
     usePractice();
+  
+  const { handleListen, showResult, setShowResult, setLastResult, setUserAnswer, setIsListening, setIsAnalyzing, isListening, isAnalyzing, lastResult, userAnswer, handleStopListening } = useAudioRecording();
 
-  const [isListening, setIsListening] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [userAnswer, setUserAnswer] = useState("");
-  const [showResult, setShowResult] = useState(false);
-  const [lastResult, setLastResult] = useState<{
-    isCorrect: boolean;
-    feedback: string;
-  } | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (session) {
@@ -32,7 +24,7 @@ export const MainCard = () => {
       setIsListening(false);
       setIsAnalyzing(false);
     }
-  }, [session]);
+  }, [session, setShowResult, setLastResult, setUserAnswer, setIsListening, setIsAnalyzing]);
 
   const handleNext = () => {
     setShowResult(false);
@@ -52,87 +44,9 @@ export const MainCard = () => {
       setIsProcessing(false);
       console.error("Erro ao reproduzir áudio:", error);
     }
-
     setIsProcessing(false);
   };
-
-  // 🎤 PROCESSA RESULTADO
-  const handleSpeechResult = async (transcript: string) => {
-    setUserAnswer(transcript);
-    setIsAnalyzing(true);
-
-    try {
-      const result = await processSpeechResult(
-        transcript,
-        {
-          transcript,
-          currentSentence,
-          sessionId: session?.id,
-          progress,
-        },
-        checkAnswer,
-      );
-
-      setLastResult(result.result);
-      setShowResult(true);
-    } catch (error) {
-      console.error("Speech evaluation error:", error);
-      setLastResult({
-        isCorrect: false,
-        feedback: "Erro inesperado. Tente novamente.",
-      });
-      setShowResult(true);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  // 🎤 ESCUTAR FALA — ajustado para Android/iOS
-  const handleListen = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-
-      const mediaRecorder = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
-        });
-
-        setIsListening(false);
-        setIsAnalyzing(true);
-
-        try {
-          const transcript = await transcribeAudio(audioBlob);
-          await handleSpeechResult(transcript);
-        } catch (error) {
-          console.error("Erro ao transcrever:", error);
-          alert("Erro ao processar áudio.");
-        } finally {
-          setIsAnalyzing(false);
-        }
-      };
-
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-      setIsListening(true);
-    } catch (err) {
-      console.error("Erro ao acessar microfone:", err);
-      alert("Permissão para usar o microfone é necessária.");
-    }
-  };
-
-  const handleStopListening = () => {
-    mediaRecorderRef.current?.stop();
-    setIsListening(false);
-  };
+  
 
   // 🎨 JSX
   if (loading) {
@@ -248,26 +162,3 @@ export const MainCard = () => {
     </div>
   );
 };
-
-// CSS personalizado para animação de balanço
-const style = `
-  @keyframes sway {
-    0%, 100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
-  }
-
-  .animate-sway {
-    animation: sway 0.8s ease-in-out infinite;
-  }
-`;
-
-// Inject CSS
-if (
-  typeof document !== "undefined" &&
-  !document.getElementById("sway-animation")
-) {
-  const styleElement = document.createElement("style");
-  styleElement.id = "sway-animation";
-  styleElement.textContent = style;
-  document.head.appendChild(styleElement);
-}

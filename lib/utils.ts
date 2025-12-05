@@ -11,6 +11,7 @@ export interface EvaluationParams {
   currentSentence: string | null;
   sessionId?: string;
   progress: number;
+  userId?: string;
 }
 
 export interface EvaluationResult {
@@ -26,7 +27,7 @@ export interface EvaluationResult {
 export async function evaluateUserSpeech(
   params: EvaluationParams,
 ): Promise<EvaluationResult> {
-  const { transcript, currentSentence, sessionId, progress } = params;
+  const { transcript, currentSentence, sessionId, progress, userId } = params;
 
   if (!currentSentence) {
     return {
@@ -42,6 +43,7 @@ export async function evaluateUserSpeech(
       correctSentence: currentSentence,
       sessionId,
       sentenceIndex: progress - 1, // currentIndex é baseado em 0
+      userId,
     };
 
     const response = await fetch("/api/evaluateAttempt", {
@@ -137,6 +139,7 @@ export async function updateSessionProgress(
   sentences: string[],
   currentProgress: number,
   completeSessionFn: () => Promise<void>,
+  userId: string,
 ): Promise<void> {
   try {
     // Import the service functions dynamically to avoid circular imports
@@ -145,10 +148,10 @@ export async function updateSessionProgress(
     );
 
     // 1. Save answer in database
-    await markAnswerAsCorrect(sessionId, answer);
+    await markAnswerAsCorrect(sessionId, answer, userId);
 
     // 2. Increment index in database
-    await incrementCurrentIndex(sessionId);
+    await incrementCurrentIndex(sessionId, userId);
 
     // 3. Update local progress
     const newProgress = currentProgress + 1;

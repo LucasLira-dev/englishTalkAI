@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userAnswer, correctSentence, sessionId, sentenceIndex } = body;
+    const { userAnswer, correctSentence, sessionId, sentenceIndex, userId } = body;
 
     // Validate required fields
     if (!userAnswer || !correctSentence) {
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
     const evaluation = await generateResult(userAnswer, correctSentence);
 
     // If the answer is correct and we have session info, persist it
-    if (evaluation.isCorrect && sessionId) {
+    if (evaluation.isCorrect && sessionId && userId) {
       try {
-        await markAnswerAsCorrect(sessionId, userAnswer);
+        await markAnswerAsCorrect(sessionId, userAnswer, userId);
       } catch (persistError) {
         console.error("Error persisting correct answer:", persistError);
         // Don't fail the request if persistence fails, just log it
@@ -101,6 +101,7 @@ export async function GET() {
           correctSentence: "Hello, how are you today?",
           sessionId: "optional-session-id",
           sentenceIndex: 0,
+          userId: "user-firebase-uid",
         },
       },
     },

@@ -3,12 +3,14 @@
 import { useRef, useState } from "react";
 import { processSpeechResult } from "@/lib/utils";
 import { usePractice } from "../contexts/practiceContext";
+import { useUserContext } from "../contexts/userContext";
 import { transcribeAudio } from "@/shared/services/elevenLabsService";
 
 export const useAudioRecording = () => {
   
   const { currentSentence, progress, session, checkAnswer } =
     usePractice();
+  const { user } = useUserContext();
   
   const [isListening, setIsListening] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -80,6 +82,7 @@ export const useAudioRecording = () => {
           currentSentence,
           sessionId: session?.id,
           progress,
+          userId: user?.uid,
         },
         checkAnswer,
       );

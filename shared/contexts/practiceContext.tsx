@@ -78,11 +78,11 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
 
   // 🔹 Quando o usuário termina todas as frases
   async function completeSession() {
-    if (!session) return;
+    if (!session || !user) return;
 
     try {
       // 1. Marca sessão atual como completa
-      await markSessionAsCompleted(session.id);
+      await markSessionAsCompleted(session.id, user.uid);
 
       // 2. Busca ou cria uma nova
       await loadSession();
@@ -93,7 +93,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
 
   // checar se usuario acertou
   async function checkAnswer(answer: string) {
-    if (!session) return;
+    if (!session || !user) return;
 
     try {
       await updateSessionProgress(
@@ -104,6 +104,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
         session.sentences,
         progress,
         completeSession,
+        user.uid,
       );
     } catch (error) {
       console.error("Error checking answer:", error);

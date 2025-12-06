@@ -139,7 +139,6 @@ export async function updateSessionProgress(
   sentences: string[],
   currentProgress: number,
   completeSessionFn: () => Promise<void>,
-  userId: string,
 ): Promise<void> {
   try {
     // Import the service functions dynamically to avoid circular imports
@@ -148,10 +147,10 @@ export async function updateSessionProgress(
     );
 
     // 1. Save answer in database
-    await markAnswerAsCorrect(sessionId, answer, userId);
+    await markAnswerAsCorrect(sessionId, answer);
 
     // 2. Increment index in database
-    await incrementCurrentIndex(sessionId, userId);
+    await incrementCurrentIndex(sessionId);
 
     // 3. Update local progress
     const newProgress = currentProgress + 1;

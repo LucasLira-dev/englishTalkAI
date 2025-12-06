@@ -104,7 +104,6 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
         session.sentences,
         progress,
         completeSession,
-        user.uid,
       );
     } catch (error) {
       console.error("Error checking answer:", error);

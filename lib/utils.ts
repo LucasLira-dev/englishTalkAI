@@ -137,7 +137,7 @@ export async function updateSessionProgress(
   updateProgressFn: (newProgress: number) => void,
   updateCurrentSentenceFn: (sentence: string | null) => void,
   sentences: string[],
-  currentProgress: number,
+  _currentProgress: number,
   completeSessionFn: () => Promise<void>,
 ): Promise<void> {
   try {
@@ -147,15 +147,15 @@ export async function updateSessionProgress(
     );
 
     // 1. Save answer and increment index in database (both done in one API call now)
-    await markAnswerAsCorrect(sessionId, answer);
+    const result = await markAnswerAsCorrect(sessionId, answer);
+    const newCurrentIndex = result.newCurrentIndex;
 
-    // 2. Update local progress
-    const newProgress = currentProgress + 1;
-    updateProgressFn(newProgress);
+    // 2. Update local progress (currentIndex + 1 for display purposes)
+    updateProgressFn(newCurrentIndex + 1);
 
     // 3. Update current sentence or complete session
-    if (newProgress < sentences.length) {
-      updateCurrentSentenceFn(sentences[newProgress]);
+    if (newCurrentIndex < sentences.length) {
+      updateCurrentSentenceFn(sentences[newCurrentIndex]);
     } else {
       // 4. If completed all sentences, mark session as complete
       await completeSessionFn();

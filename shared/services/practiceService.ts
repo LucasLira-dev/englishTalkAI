@@ -79,7 +79,8 @@ export async function markAnswerAsCorrect(sessionId: string, answer: string) {
     throw new Error(error.error || "Erro ao atualizar progresso");
   }
 
-  return await response.json();
+  const result = await response.json();
+  return result; // Retorna { success: true, newCurrentIndex }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

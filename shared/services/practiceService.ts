@@ -1,14 +1,10 @@
 import {
   addDoc,
   collection,
-  doc,
   serverTimestamp,
   Timestamp,
-  updateDoc,
-  getDoc,
-  arrayUnion,
 } from "firebase/firestore";
-import { firestore } from "../firebase";
+import { firestore, auth } from "../firebase";
 
 export interface PracticeSession {
   userId: string;
@@ -18,6 +14,15 @@ export interface PracticeSession {
   currentIndex: number;
   completed: boolean;
   createdAt: Timestamp;
+}
+
+// Helper function to get auth token
+async function getAuthToken(): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("Usuário não autenticado");
+  }
+  return await user.getIdToken();
 }
 
 export async function savePracticeSession(userId: string, sentences: string[]) {
@@ -38,34 +43,48 @@ export async function savePracticeSession(userId: string, sentences: string[]) {
 }
 
 export async function markSessionAsCompleted(sessionId: string) {
-  const sessionDoc = doc(firestore, "practiceSessions", sessionId);
-  await updateDoc(sessionDoc, { 
-    completed: true
+  const token = await getAuthToken();
+
+  const response = await fetch("/api/completeSession", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ sessionId }),
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Erro ao completar sessão");
+  }
+
+  return await response.json();
 }
 
 export async function markAnswerAsCorrect(sessionId: string, answer: string) {
-  const sessionDoc = doc(firestore, "practiceSessions", sessionId);
+  const token = await getAuthToken();
 
-  await updateDoc(sessionDoc, {
-    userAnswers: arrayUnion(answer)
+  const response = await fetch("/api/updateProgress", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ sessionId, answer }),
   });
-}
 
-export async function incrementCurrentIndex(sessionId: string) {
-  const sessionDoc = doc(firestore, "practiceSessions", sessionId);
-
-  // Get current session data
-  const sessionSnap = await getDoc(sessionDoc);
-  if (!sessionSnap.exists()) {
-    throw new Error("Session not found");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Erro ao atualizar progresso");
   }
 
-  const sessionData = sessionSnap.data() as PracticeSession;
-  const newCurrentIndex = sessionData.currentIndex + 1;
+  return await response.json();
+}
 
-  // Update current index
-  await updateDoc(sessionDoc, {
-    currentIndex: newCurrentIndex
-  });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function incrementCurrentIndex(_sessionId: string) {
+  // Esta função não é mais necessária, pois o incremento é feito junto com markAnswerAsCorrect
+  // Mantendo por compatibilidade, mas não faz nada
+  console.warn("incrementCurrentIndex is deprecated, use markAnswerAsCorrect instead");
 }

@@ -53,10 +53,14 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
+      const token = await auth.currentUser.getIdToken();
+      
       const res = await fetch("/api/practice", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid }),
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
       });
 
       const data = await res.json();

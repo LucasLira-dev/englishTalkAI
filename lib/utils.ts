@@ -142,25 +142,22 @@ export async function updateSessionProgress(
 ): Promise<void> {
   try {
     // Import the service functions dynamically to avoid circular imports
-    const { markAnswerAsCorrect, incrementCurrentIndex } = await import(
+    const { markAnswerAsCorrect } = await import(
       "@/shared/services/practiceService"
     );
 
-    // 1. Save answer in database
+    // 1. Save answer and increment index in database (both done in one API call now)
     await markAnswerAsCorrect(sessionId, answer);
 
-    // 2. Increment index in database
-    await incrementCurrentIndex(sessionId);
-
-    // 3. Update local progress
+    // 2. Update local progress
     const newProgress = currentProgress + 1;
     updateProgressFn(newProgress);
 
-    // 4. Update current sentence or complete session
+    // 3. Update current sentence or complete session
     if (newProgress < sentences.length) {
       updateCurrentSentenceFn(sentences[newProgress]);
     } else {
-      // 5. If completed all sentences, mark session as complete
+      // 4. If completed all sentences, mark session as complete
       await completeSessionFn();
     }
   } catch (error) {

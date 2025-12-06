@@ -1,29 +1,69 @@
 import { NextResponse } from "next/server";
 import { generateSession } from "../../../lib/genai";
-import { savePracticeSession } from "@/shared/services/practiceService";
-import { getUnCompletedSession } from "@/shared/firebase";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { adminAuth } from "@/shared/firebaseAdmin";
+
+const db = getFirestore();
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await request.json();
+    // Verificar autenticação
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Token de autenticação não fornecido" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+    let decodedToken;
     
-    const existingSession = await getUnCompletedSession(userId);
-    if (existingSession) {
+    try {
+      decodedToken = await adminAuth.verifyIdToken(token);
+    } catch (error) {
+      console.error("Error verifying token:", error);
+      return NextResponse.json(
+        { error: "Token inválido ou expirado" },
+        { status: 401 }
+      );
+    }
+
+    const userId = decodedToken.uid;
+    
+    // Buscar sessão incompleta existente
+    const sessionsRef = db.collection("practiceSessions");
+    const q = sessionsRef
+      .where("userId", "==", userId)
+      .where("completed", "==", false)
+      .limit(1);
+    
+    const querySnapshot = await q.get();
+    
+    if (!querySnapshot.empty) {
+      const sessionDoc = querySnapshot.docs[0];
       return NextResponse.json({
         success: true,
-        session: existingSession,
+        session: { id: sessionDoc.id, ...sessionDoc.data() },
       });
     }
     
-
-    // Generate 6 sentences for the session
+    // Criar nova sessão
     const sentences = await generateSession();
-    const newSession = await savePracticeSession(userId, sentences);
+    const sessionData = {
+      userId,
+      sentences,
+      userAnswers: [],
+      currentIndex: 0,
+      completed: false,
+      createdAt: FieldValue.serverTimestamp(),
+    };
 
-
+    const docRef = await sessionsRef.add(sessionData);
+    
     return NextResponse.json({
       success: true,
-      session: newSession,
+      session: { id: docRef.id, ...sessionData, createdAt: new Date() },
     });
   } catch (error) {
     console.error("Error creating practice session:", error);

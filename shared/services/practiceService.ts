@@ -37,24 +37,22 @@ export async function savePracticeSession(userId: string, sentences: string[]) {
   return { id: docRef.id, ...sessionData };
 }
 
-export async function markSessionAsCompleted(sessionId: string, userId: string) {
+export async function markSessionAsCompleted(sessionId: string) {
   const sessionDoc = doc(firestore, "practiceSessions", sessionId);
   await updateDoc(sessionDoc, { 
-    completed: true,
-    userId: userId
+    completed: true
   });
 }
 
-export async function markAnswerAsCorrect(sessionId: string, answer: string, userId: string) {
+export async function markAnswerAsCorrect(sessionId: string, answer: string) {
   const sessionDoc = doc(firestore, "practiceSessions", sessionId);
 
   await updateDoc(sessionDoc, {
-    userAnswers: arrayUnion(answer),
-    userId: userId
+    userAnswers: arrayUnion(answer)
   });
 }
 
-export async function incrementCurrentIndex(sessionId: string, userId: string) {
+export async function incrementCurrentIndex(sessionId: string) {
   const sessionDoc = doc(firestore, "practiceSessions", sessionId);
 
   // Get current session data
@@ -68,7 +66,6 @@ export async function incrementCurrentIndex(sessionId: string, userId: string) {
 
   // Update current index
   await updateDoc(sessionDoc, {
-    currentIndex: newCurrentIndex,
-    userId: userId
+    currentIndex: newCurrentIndex
   });
 }

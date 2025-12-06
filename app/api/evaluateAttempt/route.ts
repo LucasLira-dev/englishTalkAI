@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userAnswer, correctSentence, sessionId, sentenceIndex, userId } = body;
+    const { userAnswer, correctSentence, sessionId, sentenceIndex } = body;
 
     // Validate required fields
     if (!userAnswer || !correctSentence) {
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
     const evaluation = await generateResult(userAnswer, correctSentence);
 
     // If the answer is correct and we have session info, persist it
-    if (evaluation.isCorrect && sessionId && userId) {
+    if (evaluation.isCorrect && sessionId) {
       try {
-        await markAnswerAsCorrect(sessionId, userAnswer, userId);
+        await markAnswerAsCorrect(sessionId, userAnswer);
       } catch (persistError) {
         console.error("Error persisting correct answer:", persistError);
         // Don't fail the request if persistence fails, just log it

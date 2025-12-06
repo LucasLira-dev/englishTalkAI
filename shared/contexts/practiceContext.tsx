@@ -82,7 +82,7 @@ export function PracticeProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // 1. Marca sessão atual como completa
-      await markSessionAsCompleted(session.id, user.uid);
+      await markSessionAsCompleted(session.id);
 
       // 2. Busca ou cria uma nova
       await loadSession();
